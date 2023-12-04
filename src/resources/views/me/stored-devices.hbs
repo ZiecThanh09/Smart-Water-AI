@@ -1,0 +1,147 @@
+<form class="container mt-4" name="container-form" method="POST" action="/devices/handle-form-actions">
+    <div>
+        <h3>Devices</h3>
+        <a href="/me/trash/devices">Bin ({{deletedCount}})</a>
+
+        <div class="mt-4 d-flex align-items-center">
+            <select class="form-control form-control-sm checkbox-select-all-options" name="action" required>
+                <option value="">-- Choose action --</option>
+                <option value="delete">Delete</option>
+            </select>
+
+            <button class="btn btn-primary btn-sm btn-check-all-submit" disabled>Confirm</button>
+        </div>
+    </div>
+
+    <table class="table mt-4">
+        <thead>
+            <tr>
+                <th scope="col">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="" id="checkbox-all">
+                        <label class="form-check-label" for="checkbox-all">
+                            Select all
+                        </label>
+                    </div>
+                </th>
+                <th scope="col">
+                    ID
+                    {{{sortable '_id' _sort}}}
+                </th>
+                <th scope="col">
+                    Name
+                    {{{sortable 'name' _sort}}}
+                </th>
+                <th scope="col">
+                    Location
+                    {{{sortable 'location' _sort}}}
+                </th>
+                <th scope="col" colspan="2">
+                    Created at
+                    {{{sortable 'createdAt' _sort}}}
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each devices}}
+            <tr>
+                <td>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="deviceIds[]" value="{{this._id}}">
+                    </div>
+                </td>
+                <th scope="row">{{this._id}}</th>
+                <td>{{this.name}}</td>
+                <td>{{this.location}}</td>
+                <td>{{this.createdAt}}</td>
+                <td>
+                    <a href="/devices/{{this._id}}/edit" class="btn btn-link">Edit</a>
+                    <a href="" class="btn btn-link" data-toggle="modal" data-id="{{this._id}}"
+                        data-target="#delete-device-modal">Delete</a>
+                </td>
+            </tr>
+            {{else}}
+            <tr>
+                <td colspan="5" class="text-center">
+                    Have no any devices! 
+                    <a href="/devices/create">Add device</a>
+                </td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+</form>
+
+{{!-- Confirm delete device --}}
+<div id="delete-device-modal" class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Delete device</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure to delete this device?</p>
+            </div>
+            <div class="modal-footer">
+                <button id="btn-delete-device" type="button" class="btn btn-danger">Delete</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{!-- Delete hidden form --}}
+<form name="delete-device-form" method="POST"></form>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var deviceId;
+        var deleteForm = document.forms['delete-device-form'];
+        var containerForm = $('form[name="container-form"]');
+        var btnDeleteDevice = document.getElementById('btn-delete-device');
+        var checkboxAll = $('#checkbox-all');
+        var deviceItemCheckbox = $('input[name="deviceIds[]"]');
+        var btnCheckAllSubmit = $('.btn-check-all-submit');
+
+        // When dialog confirm show
+        $('#delete-device-modal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            deviceId = button.data('id');
+        });
+
+        // When delete confirm clicked
+        btnDeleteDevice.onclick = function () {
+            deleteForm.action = '/devices/' + deviceId + '?_method=DELETE';
+            deleteForm.submit();
+        };
+
+        // Checkbox all changed
+        checkboxAll.change(function () {
+            var isCheckedAll = $(this).prop('checked');
+            deviceItemCheckbox.prop('checked', isCheckedAll);
+            renderCheckAllSubmitBtn();
+        });
+
+        // Device item checkbox changed
+        deviceItemCheckbox.change(function () {
+            var isCheckedAll = deviceItemCheckbox.length === $('input[name="deviceIds[]"]:checked').length;
+            checkboxAll.prop('checked', isCheckedAll);
+            renderCheckAllSubmitBtn();
+        });
+
+
+
+        // Re-render check all submit button
+        function renderCheckAllSubmitBtn() {
+            var checkedCount = $('input[name="deviceIds[]"]:checked').length;
+            if (checkedCount > 0) {
+                btnCheckAllSubmit.attr('disabled', false);
+            } else {
+                btnCheckAllSubmit.attr('disabled', true);
+            }
+        }
+    });
+</script>

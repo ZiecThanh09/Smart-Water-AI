@@ -1,0 +1,43 @@
+{
+  "name": "smart-water-monitoring",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.js",
+  "scripts": {
+    "beautiful": "prettier --single-quote --tab-width --use-tabs --trailing-comma all --write src/**/*.{js,json,scss}",
+    "start": "nodemon --inspect src/index.js",
+    "watch": "sass --watch src/resources/scss/app.scss src/public/css/app.css",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "aiot"
+  ],
+  "author": "ziecthanh",
+  "license": "ISC",
+  "dependencies": {
+    "@azure/msal-node": "^2.5.1",
+    "@azure/storage-blob": "^12.14.0",
+    "@azure/storage-queue": "^12.13.0",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-handlebars": "^7.1.2",
+    "express-session": "^1.17.3",
+    "install": "^0.13.0",
+    "method-override": "^3.0.0",
+    "mongoose-delete": "^0.5.4",
+    "mongoose-sequence": "^5.3.1",
+    "mongoose-slug-generator": "^1.0.4",
+    "passport": "^0.7.0",
+    "passport-local": "^1.0.0"
+  },
+  "devDependencies": {
+    "handlebars": "^4.5.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^13.2.0",
+    "mongoose": "^6.10.0",
+    "morgan": "^1.10.0",
+    "nodemon": "^2.0.21",
+    "prettier": "^2.8.4",
+    "sass": "^1.59.2"
+  }
+}

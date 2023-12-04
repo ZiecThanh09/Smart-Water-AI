@@ -1,0 +1,94 @@
+<div class="container mt-4">
+    <div>
+        <a href="/me/stored/devices">Back</a>
+        <h3>Deleted device</h3>
+    </div>
+
+    <table class="table mt-4">
+        <thead>
+            <tr>
+                <th scope="col">No.</th>
+                <th scope="col">Name</th>
+                <th scope="col">Location</th>
+                <th scope="col" colspan="2">Deleted at</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each devices}}
+            <tr>
+                <th scope="row">{{sum @index 1}}</th>
+                <td>{{this.name}}</td>
+                <td>{{this.location}}</td>
+                <td>{{this.deletedAt}}</td>
+                <td>
+                    <a href="" class="btn btn-link btn-restore" data-id="{{this._id}}">Recover</a>
+                    <a href="" class="btn btn-link" data-toggle="modal" data-id="{{this._id}}"
+                        data-target="#delete-device-modal">Permanently delete</a>
+                </td>
+            </tr>
+
+            {{else}}
+            <tr>
+                <td colspan="5" class="text-center">
+                    Empty bin. 
+                    <a href="/me/stored/devices">List of devices</a>
+                </td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+</div>
+
+{{!-- Confirm delete device --}}
+<div id="delete-device-modal" class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Delete device</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure to delete this device?</p>
+            </div>
+            <div class="modal-footer">
+                <button id="btn-delete-device" type="button" class="btn btn-danger">Delete</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<form name="delete-device-form" method="POST"></form>
+<form name="restore-device-form" method="POST"></form>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var deviceId;
+        var deleteForm = document.forms['delete-device-form'];
+        var restoreForm = document.forms['restore-device-form'];
+        var btnDeleteDevice = document.getElementById('btn-delete-device');
+        var btnRestore = $('.btn-restore');
+
+        // When dialog confirm show
+        $('#delete-device-modal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            deviceId = button.data('id');
+        });
+
+        // When delete confirm clicked
+        btnDeleteDevice.onclick = function () {
+            deleteForm.action = '/devices/' + deviceId + '/force?_method=DELETE';
+            deleteForm.submit();
+        }
+
+        // Restore btn clicked
+        btnRestore.click(function (e) {
+            e.preventDefault();
+            var deviceId = $(this).data('id');
+            restoreForm.action = '/devices/' + deviceId + '/restore?_method=PATCH';
+            restoreForm.submit();
+        });
+    });
+</script>
