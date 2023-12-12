@@ -248,7 +248,6 @@ app.get('/redirect', (req, res) => {
 
 			req.session.sessionParams = { user: response.account, idToken: response.idToken };
 			console.log("\nAuthToken: \n" + JSON.stringify(response));
-			localStorage.setItem('authToken', JSON.stringify(response));
 			Device.find({}).then((devices) =>
 				res.render('home', {
 					devices: multipleMongooseToObject(devices),
