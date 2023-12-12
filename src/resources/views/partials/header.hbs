@@ -1,5 +1,5 @@
 <nav class='navbar navbar-expand-lg navbar-dark bg-primary' style="padding: 50 0 50 0;">
-	<a class='navbar-brand' href='/'>Dashboard</a>
+	<a class='navbar-brand btn-dashboard' href='/'>Dashboard</a>
 	<button class='navbar-toggler' type='button' data-toggle='collapse' data-target='#navbarSupportedContent'
 		aria-controls='navbarSupportedContent' aria-expanded='false' aria-label='Toggle navigation'>
 		<span class='navbar-toggler-icon'></span>
@@ -26,10 +26,28 @@
 					<div class="dropdown-divider"></div>
 					<a class="dropdown-item" href="/password">Change Password</a>
 					<div class="dropdown-divider"></div>
-					<a class="dropdown-item" href="/signout">Sign Out</a>
+					<a class="dropdown-item btn-logout" href="/signout">Sign Out</a>
 				</div>
 			</li>
 			{{/if}}
 		</ul>
 	</div>
 </nav>
+
+<script>
+	const givenName = "{{givenName}}";
+	console.log(givenName);
+
+	if (!givenName) {
+		const givenNameID = document.querySelector("#navbarDropdown");
+		console.log(givenNameID)
+		givenNameID.innerHTML = localStorage.getItem("givenName")
+	} else {
+		localStorage.setItem("givenName", givenName);
+	}
+
+	const btnLogout = document.querySelector(".btn-logout");
+	btnLogout.addEventListener("click", () => {
+		localStorage.removeItem("givenName");
+	})
+</script>

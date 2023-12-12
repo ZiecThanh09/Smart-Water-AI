@@ -11,7 +11,6 @@ const Device = require('./app/models/Device.js');
 const { multipleMongooseToObject } = require('./util/mongoose.js');
 
 const SortMiddleware = require('./app/middlewares/SortMiddleware');
-const LoginStateMiddleware = require('./app/middlewares/LoginStateMiddleware');
 
 const route = require('./routes/index');
 const db = require('./config/db');
@@ -247,7 +246,6 @@ app.get('/redirect', (req, res) => {
 		confidentialClientApplication.acquireTokenByCode(tokenRequest).then((response) => {
 
 			req.session.sessionParams = { user: response.account, idToken: response.idToken };
-			console.log("\nAuthToken: \n" + JSON.stringify(response));
 			Device.find({}).then((devices) =>
 				res.render('home', {
 					devices: multipleMongooseToObject(devices),
@@ -255,8 +253,6 @@ app.get('/redirect', (req, res) => {
 					givenName: response.account.idTokenClaims.given_name,
 				}),
 			);
-			var userName = response.account.idTokenClaims.given_name;
-			app.set('Username', userName);
 			route(app);
 		}).catch((error) => {
 			console.log("\nErrorAtLogin: \n" + error);
@@ -299,7 +295,7 @@ app.get('/redirect', (req, res) => {
 		//Request token with claims, including the name that was updated.
 		confidentialClientApplication.acquireTokenByCode(tokenRequest).then((response) => {
 			req.session.sessionParams = { user: response.account, idToken: response.idToken };
-			console.log("\AuthToken: \n" + JSON.stringify(response));
+			console.log("\nAuthToken: \n" + JSON.stringify(response));
 			Device.find({}).then((devices) =>
 				res.render('home', {
 					devices: multipleMongooseToObject(devices),
@@ -316,8 +312,6 @@ app.get('/redirect', (req, res) => {
 	}
 
 });
-
-app.use(LoginStateMiddleware);
 
 // async function receiveMessages() {
 // 	while (true) {

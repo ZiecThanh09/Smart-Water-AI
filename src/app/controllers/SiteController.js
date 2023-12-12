@@ -4,14 +4,25 @@ const { multipleMongooseToObject } = require('../../util/mongoose');
 class SiteController {
 	// [GET] /home
 	home(req, res, next) {
-		Device.find({})
-			.then((devices) =>
+		if (req.session.userName) {
+			Device.find({}).then((devices) =>
 				res.render('home', {
 					devices: multipleMongooseToObject(devices),
-					showSignInButton: true,
+					showSignInButton: false,
+					givenName: req.session.userName,
 				}),
-			)
-			.catch(next);
+			);
+			console.log('USERNAME: ' + req.session.userName);
+		} else {
+			Device.find({})
+				.then((devices) =>
+					res.render('home', {
+						devices: multipleMongooseToObject(devices),
+						showSignInButton: true,
+					}),
+				)
+				.catch(next);
+		}
 	}
 
 	// [GET] /search
