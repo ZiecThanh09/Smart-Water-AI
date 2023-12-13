@@ -72,6 +72,14 @@
                     {{else}}
                     <h3 style="color: green;">{{devices.6.status}}</h3>
                     {{/isOr}}
+
+                    <h3>Potability</h3>
+                    {{#eq devices.7.potability 'Drinkable'}}
+                    <h3 style="color: green;">Drinkable</h3>
+                    {{else}}
+                    <h3 style="color: red;">Undrinkable</h3>
+                    {{/eq}}
+
                 </div>
             </div>
         </div>

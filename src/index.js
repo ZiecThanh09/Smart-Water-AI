@@ -146,6 +146,9 @@ app.engine(
 
 				return `<a href="?_sort&column=${field}&type=${type}"><span class="${icon}"></span></a>`;
 			},
+			eq: (a, b, options) => {
+				return a === b ? options.inverse(this) : options.fn(this);
+			}
 		},
 	}),
 );

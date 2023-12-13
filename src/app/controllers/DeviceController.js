@@ -1,5 +1,8 @@
 const Device = require('../models/Device');
+
 const { mongooseToObject } = require('../../util/mongoose');
+
+let { PythonShell } = require('python-shell');
 
 // Azure Storage Account
 const { BlobServiceClient } = require('@azure/storage-blob');
@@ -100,9 +103,28 @@ async function readData() {
 		}
 	}
 
+	TDS = cond * 1000 / 2;
+
+	const inputData = [pH, TDS, 0, 0, 0, cond, 0, 0, 0]; // Replace with your actual input data
+
+	let options = {
+		mode: 'text',
+		pythonOptions: ['-u'], // unbuffered output
+		scriptPath: 'D://Downloads//Smart-Water-Monitoring-master//src//app//pythonshell', // Replace with the actual path
+		args: inputData.map(String)
+	};
+
 	let status = getStatus(pH, DO, TDS);
 	obj.data.push(status);
 
+	PythonShell.run('python_script.py', options).then(messages => {
+		// results is an array consisting of messages collected during execution
+		let potability = getPotability(JSON.stringify(messages));
+		obj.data.push(potability);
+		console.log(obj);
+	});
+
+	//console.log(obj.data);
 	return obj.data;
 }
 
@@ -138,6 +160,16 @@ function getStatus(pH, DO, TDS) {
 		return obj;
 	}
 	let obj = { status: 'Safe' };
+	return obj;
+}
+
+// Predict quality from trained model
+function getPotability(message) {
+	if (message === '["[1]"]') {
+		let obj = { potability: 'Drinkable' };
+		return obj;
+	}
+	let obj = { status: 'Undrinkable' };
 	return obj;
 }
 
