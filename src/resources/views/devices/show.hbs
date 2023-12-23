@@ -1,47 +1,74 @@
 <div class='mt-1'>
     <div class='row' style="margin: 0 0 0 0;">
         <div class="col-lg-12">
-            <div class="row">
-                {{#each devices}}
-                <div class='col-sm-6 col-lg-4 mt-5' style="text-align: center;">
-                    {{#compareStrings this.sensor 'BAT'}}
-                    <span class='dot bat'>
-                        <h3>{{ this.value }}%</h3>
-                    </span>
-                    <h4 class='name mt-2'>Battery</h4>
-                    {{/compareStrings }}
-                    {{#compareStrings this.sensor 'PH'}}
-                    <span class='dot pH'>
-                        <h3>{{ this.value }}</h3>
-                    </span>
-                    <h4 class='name mt-2'>pH</h4>
-                    {{/compareStrings }}
-                    {{#compareStrings this.sensor 'WT'}}
-                    <span class='dot wt'>
-                        <h3>{{ this.value }}°C</h3>
-                    </span>
-                    <h4 class='name mt-2'>Temperature</h4>
-                    {{/compareStrings }}
-                    {{#compareStrings this.sensor 'COND'}}
-                    <span class='dot cond'>
-                        <h3>{{ this.value }}µS/cm</h3>
-                    </span>
-                    <h4 class='name mt-2'>Conductivity</h4>
-                    {{/compareStrings }}
-                    {{#compareStrings this.sensor 'DO'}}
-                    <span class='dot do'>
-                        <h3>{{ this.value }}%</h3>
-                    </span>
-                    <h4 class='name mt-2'>DO</h4>
-                    {{/compareStrings }}
-                    {{#compareStrings this.sensor 'ORP'}}
-                    <span class='dot orp'>
-                        <h3>{{ this.value }}V</h3>
-                    </span>
-                    <h4 class='name mt-2'>ORP</h4>
-                    {{/compareStrings }}
+            <div class="row" style="display: flex; flex-direction: row; justify-content: space-around;">
+                <div class="describe" style="width: 15%; padding: 10px;">
+                        <table style="border: 1px solid black; width: 100%;">
+                            <caption style="text-align: center;">Annotation Table </caption>
+                            <tr style="border: 1px solid black;">
+                                <th style="border: 1px solid black; width: 30%;">Color</th>
+                                <th style="text-align: end; padding: 8px">Level</th>
+                            </tr>
+                            <tr style="border: 1px solid black">
+                                <td style="height: 1px; width: 1px; background-color: #B80000;"></td>
+                                <td style="text-align: end; padding: 8px">Nguy hiểm</td>
+                            </tr>
+                            <tr style="border: 1px solid black">
+                                <td style="height: 1px; width: 1px; background-color: #E36414;"></td>
+                                <td style="text-align: end; padding: 8px">Cảnh báo</td>
+                            </tr>
+                            <tr style="border: 1px solid black">
+                                <td style="height: 1px; width: 1px; background-color: #F4CE14;"></td>
+                                <td style="text-align: end; padding: 8px">Chấp nhận được</td>
+                            </tr>
+                            <tr style="border: 1px solid black">
+                                <td style="height: 1px; width: 1px; background-color: #65B741;"></td>
+                                <td style="text-align: end; padding: 8px">An toàn</td>
+                            </tr>
+                        </table>
+                    </div>
+                <div class="container row" >
+                    {{#each devices}}
+                    <div class='col-sm-6 col-lg-4 mt-5' style="text-align: center;">
+                        {{#compareStrings this.sensor 'BAT'}}
+                        <span class='dot bat'>
+                            <h3>{{ this.value }}%</h3>
+                        </span>
+                        <h4 class='name mt-2'>Battery</h4>
+                        {{/compareStrings }}
+                        {{#compareStrings this.sensor 'PH'}}
+                        <span class='dot pH'>
+                            <h3>{{ this.value }}</h3>
+                        </span>
+                        <h4 class='name mt-2'>pH</h4>
+                        {{/compareStrings }}
+                        {{#compareStrings this.sensor 'WT'}}
+                        <span class='dot wt'>
+                            <h3>{{ this.value }}°C</h3>
+                        </span>
+                        <h4 class='name mt-2'>Temperature</h4>
+                        {{/compareStrings }}
+                        {{#compareStrings this.sensor 'COND'}}
+                        <span class='dot cond'>
+                            <h3>{{ this.value }}µS/cm</h3>
+                        </span>
+                        <h4 class='name mt-2'>Conductivity</h4>
+                        {{/compareStrings }}
+                        {{#compareStrings this.sensor 'DO'}}
+                        <span class='dot do'>
+                            <h3>{{ this.value }}%</h3>
+                        </span>
+                        <h4 class='name mt-2'>DO</h4>
+                        {{/compareStrings }}
+                        {{#compareStrings this.sensor 'ORP'}}
+                        <span class='dot orp'>
+                            <h3>{{ this.value }}V</h3>
+                        </span>
+                        <h4 class='name mt-2'>ORP</h4>
+                        {{/compareStrings }}
+                    </div>
+                    {{/each}}
                 </div>
-                {{/each}}
 
                 <div class="status" style="text-align: center; width: 100%;">
                     <h3>Status</h3>
@@ -80,22 +107,22 @@
 
     // pH
     let valuepH = parseFloat(pH.textContent)
-    if(valuepH <= 4) {
+    if (valuepH <= 4) {
         pH.style.color = red;
         pH.style.borderColor = red;
-    } else if(valuepH > 4 && valuepH <= 5) {
+    } else if (valuepH > 4 && valuepH <= 5) {
         pH.style.color = orange;
         pH.style.borderColor = orange;
-    } else if(valuepH > 5 && valuepH <= 6) {
+    } else if (valuepH > 5 && valuepH <= 6) {
         pH.style.color = yellow;
         pH.style.borderColor = yellow;
-    } else if(valuepH > 6 && valuepH <= 8.5) {
+    } else if (valuepH > 6 && valuepH <= 8.5) {
         pH.style.color = green;
         pH.style.borderColor = green;
-    } else if(valuepH > 8.5 && valuepH <= 9) {
+    } else if (valuepH > 8.5 && valuepH <= 9) {
         pH.style.color = yellow;
         pH.style.borderColor = yellow;
-    } else if(valuepH > 9 && valuepH <= 10) {
+    } else if (valuepH > 9 && valuepH <= 10) {
         pH.style.color = orange;
         pH.style.borderColor = orange;
     } else {
@@ -105,13 +132,13 @@
 
     // ORP
     let valueORP = parseFloat(orp.textContent)
-    if(valueORP <= -0.5) {
+    if (valueORP <= -0.5) {
         orp.style.color = red;
         orp.style.borderColor = red;
-    } else if(valueORP > -0.5 && valueORP <= 0.3) {
+    } else if (valueORP > -0.5 && valueORP <= 0.3) {
         orp.style.color = green;
         orp.style.borderColor = green;
-    } else if(valueORP > 0.3 && valueORP <= 0.4) {
+    } else if (valueORP > 0.3 && valueORP <= 0.4) {
         orp.style.color = orange;
         orp.style.borderColor = orange;
     } else {
@@ -121,10 +148,10 @@
 
     // DO
     let valueDO = parseFloat(DO.textContent)
-    if(valueDO <= 6) {
+    if (valueDO <= 6) {
         DO.style.color = orange;
         DO.style.borderColor = orange;
-    } else if(valueDO > 6 && valueDO <= 8) {
+    } else if (valueDO > 6 && valueDO <= 8) {
         DO.style.color = green;
         DO.style.borderColor = green;
     } else {
@@ -134,10 +161,10 @@
 
     // COND
     let valueCOND = parseFloat(cond.textContent)
-    if(valueCOND <= 50) {
+    if (valueCOND <= 50) {
         cond.style.color = orange;
         cond.style.borderColor = orange;
-    } else if(valueCOND > 50 && valueCOND <= 800) {
+    } else if (valueCOND > 50 && valueCOND <= 800) {
         cond.style.color = green;
         cond.style.borderColor = green;
     } else {
