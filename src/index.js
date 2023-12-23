@@ -15,6 +15,15 @@ const SortMiddleware = require('./app/middlewares/SortMiddleware');
 const route = require('./routes/index');
 const db = require('./config/db');
 
+var LocalStorage = require('node-localstorage').LocalStorage;
+
+
+// LocalStorage
+var localStorage = null;
+if (typeof localStorage === "undefined" || localStorage === null) {
+    localStorage = new LocalStorage('./scratch');
+}
+
 // Connect to DB
 db.connect();
 
@@ -46,33 +55,33 @@ db.connect();
  * Confidential Client Application Configuration
  */
 const confidentialClientConfig = {
-	auth: {
-		clientId: process.env.APP_CLIENT_ID,
-		authority: process.env.SIGN_UP_SIGN_IN_POLICY_AUTHORITY,
-		clientSecret: process.env.APP_CLIENT_SECRET,
-		knownAuthorities: [process.env.AUTHORITY_DOMAIN], //This must be an array
-		redirectUri: process.env.APP_REDIRECT_URI,
-		validateAuthority: false
-	},
-	system: {
-		loggerOptions: {
-			loggerCallback(loglevel, message, containsPii) {
-				console.log(message);
-			},
-			piiLoggingEnabled: false,
-			logLevel: msal.LogLevel.Verbose,
-		}
-	}
+    auth: {
+        clientId: process.env.APP_CLIENT_ID,
+        authority: process.env.SIGN_UP_SIGN_IN_POLICY_AUTHORITY,
+        clientSecret: process.env.APP_CLIENT_SECRET,
+        knownAuthorities: [process.env.AUTHORITY_DOMAIN], //This must be an array
+        redirectUri: process.env.APP_REDIRECT_URI,
+        validateAuthority: false
+    },
+    system: {
+        loggerOptions: {
+            loggerCallback(loglevel, message, containsPii) {
+                console.log(message);
+            },
+            piiLoggingEnabled: false,
+            logLevel: msal.LogLevel.Verbose,
+        }
+    }
 };
 
 // Initialize MSAL Node
 const confidentialClientApplication = new msal.ConfidentialClientApplication(confidentialClientConfig);
 
 const APP_STATES = {
-	LOGIN: 'login',
-	LOGOUT: 'logout',
-	PASSWORD_RESET: 'password_reset',
-	EDIT_PROFILE: 'update_profile'
+    LOGIN: 'login',
+    LOGOUT: 'logout',
+    PASSWORD_RESET: 'password_reset',
+    EDIT_PROFILE: 'update_profile'
 }
 
 /** 
@@ -81,11 +90,11 @@ const APP_STATES = {
  * to acquire a token with the appropriate claims.
  */
 const authCodeRequest = {
-	redirectUri: confidentialClientConfig.auth.redirectUri,
+    redirectUri: confidentialClientConfig.auth.redirectUri,
 };
 
 const tokenRequest = {
-	redirectUri: confidentialClientConfig.auth.redirectUri,
+    redirectUri: confidentialClientConfig.auth.redirectUri,
 };
 
 /**
@@ -93,12 +102,12 @@ const tokenRequest = {
  * and set them as desired. Visit: https://www.npmjs.com/package/express-session
  */
 const sessionConfig = {
-	secret: process.env.SESSION_SECRET,
-	resave: false,
-	saveUninitialized: true,
-	cookie: {
-		secure: false, // set this to true on production
-	}
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+        secure: false, // set this to true on production
+    }
 }
 
 // Create an express instance
@@ -107,9 +116,9 @@ const app = express();
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(
-	express.urlencoded({
-		extended: true,
-	}),
+    express.urlencoded({
+        extended: true,
+    }),
 );
 app.use(express.json());
 
@@ -123,34 +132,34 @@ app.use(morgan('combined'));
 
 // Template engine
 app.engine(
-	'hbs',
-	engine({
-		extname: '.hbs',
-		helpers: {
-			sum: (a, b) => a + b,
-			sortable: (field, sort) => {
-				const sortType = field === sort.column ? sort.type : 'default';
+    'hbs',
+    engine({
+        extname: '.hbs',
+        helpers: {
+            sum: (a, b) => a + b,
+            sortable: (field, sort) => {
+                const sortType = field === sort.column ? sort.type : 'default';
 
-				const icons = {
-					default: 'oi oi-elevator',
-					asc: 'oi oi-sort-ascending',
-					desc: 'oi oi-sort-descending',
-				};
-				const types = {
-					default: 'desc',
-					asc: 'desc',
-					desc: 'asc',
-				};
-				const type = types[sortType];
-				const icon = icons[sortType];
+                const icons = {
+                    default: 'oi oi-elevator',
+                    asc: 'oi oi-sort-ascending',
+                    desc: 'oi oi-sort-descending',
+                };
+                const types = {
+                    default: 'desc',
+                    asc: 'desc',
+                    desc: 'asc',
+                };
+                const type = types[sortType];
+                const icon = icons[sortType];
 
-				return `<a href="?_sort&column=${field}&type=${type}"><span class="${icon}"></span></a>`;
-			},
-			eq: (a, b, options) => {
-				return a === b ? options.inverse(this) : options.fn(this);
-			}
-		},
-	}),
+                return `<a href="?_sort&column=${field}&type=${type}"><span class="${icon}"></span></a>`;
+            },
+            eq: (a, b, options) => {
+                return a === b ? options.inverse(this) : options.fn(this);
+            }
+        },
+    }),
 );
 
 app.set('view engine', 'hbs');
@@ -160,17 +169,17 @@ app.set('views', path.join(__dirname, 'resources', 'views'));
 app.use(session(sessionConfig));
 
 var hbs = require('handlebars');
-hbs.registerHelper("compareStrings", function (p, q, options) {
-	return p == q ? options.fn(this) : options.inverse(this);
+hbs.registerHelper("compareStrings", function(p, q, options) {
+    return p == q ? options.fn(this) : options.inverse(this);
 });
-hbs.registerHelper("isOr", function (cond1, cond2, options) {
-	return cond1 || cond2 ? options.fn(this) : options.inverse(this);
+hbs.registerHelper("isOr", function(cond1, cond2, options) {
+    return cond1 || cond2 ? options.fn(this) : options.inverse(this);
 });
-hbs.registerHelper("greaterThan", function (cond1, cond2, options) {
-	return cond1 > cond2 ? options.fn(this) : options.inverse(this);
+hbs.registerHelper("greaterThan", function(cond1, cond2, options) {
+    return cond1 > cond2 ? options.fn(this) : options.inverse(this);
 });
-hbs.registerHelper("lessThan", function (cond1, cond2, options) {
-	return cond1 < cond2 ? options.fn(this) : options.inverse(this);
+hbs.registerHelper("lessThan", function(cond1, cond2, options) {
+    return cond1 < cond2 ? options.fn(this) : options.inverse(this);
 });
 
 /**
@@ -182,143 +191,146 @@ hbs.registerHelper("lessThan", function (cond1, cond2, options) {
  */
 const getAuthCode = (authority, scopes, state, res) => {
 
-	// prepare the request
-	console.log("Fetching Authorization code")
-	authCodeRequest.authority = authority;
-	authCodeRequest.scopes = scopes;
-	authCodeRequest.state = state;
+    // prepare the request
+    console.log("Fetching Authorization code")
+    authCodeRequest.authority = authority;
+    authCodeRequest.scopes = scopes;
+    authCodeRequest.state = state;
 
-	//Each time you fetch Authorization code, update the relevant authority in the tokenRequest configuration
-	tokenRequest.authority = authority;
+    //Each time you fetch Authorization code, update the relevant authority in the tokenRequest configuration
+    tokenRequest.authority = authority;
 
-	// request an authorization code to exchange for a token
-	return confidentialClientApplication.getAuthCodeUrl(authCodeRequest)
-		.then((response) => {
-			console.log("\nAuthCodeURL: \n" + response);
-			//redirect to the auth code URL/send code to 
-			res.redirect(response);
-		})
-		.catch((error) => {
-			res.status(500).send(error);
-		});
+    // request an authorization code to exchange for a token
+    return confidentialClientApplication.getAuthCodeUrl(authCodeRequest)
+        .then((response) => {
+            console.log("\nAuthCodeURL: \n" + response);
+            //redirect to the auth code URL/send code to 
+            res.redirect(response);
+        })
+        .catch((error) => {
+            res.status(500).send(error);
+        });
 }
 
 //<ms_docref_app_endpoints>
 app.get('/', (req, res, next) => {
-	Device.find({})
-		.then((devices) =>
-			res.render('home', {
-				devices: multipleMongooseToObject(devices),
-				showSignInButton: true,
-			}),
-		)
-		.catch(next);
+    const idToken = localStorage.getItem("idToken");
+    Device.find({})
+        .then((devices) =>
+            res.render('home', {
+                devices: multipleMongooseToObject(devices),
+                showSignInButton: idToken ? false : true,
+            }),
+        )
+        .catch(next);
 });
 
 app.get('/signin', (req, res) => {
-	//Initiate a Auth Code Flow >> for sign in
-	//no scopes passed. openid, profile and offline_access will be used by default.
-	getAuthCode(process.env.SIGN_UP_SIGN_IN_POLICY_AUTHORITY, [], APP_STATES.LOGIN, res);
+    //Initiate a Auth Code Flow >> for sign in
+    //no scopes passed. openid, profile and offline_access will be used by default.
+    getAuthCode(process.env.SIGN_UP_SIGN_IN_POLICY_AUTHORITY, [], APP_STATES.LOGIN, res);
 });
 
 /**
  * Change password end point
-*/
+ */
 app.get('/password', (req, res) => {
-	getAuthCode(process.env.RESET_PASSWORD_POLICY_AUTHORITY, [], APP_STATES.PASSWORD_RESET, res);
+    getAuthCode(process.env.RESET_PASSWORD_POLICY_AUTHORITY, [], APP_STATES.PASSWORD_RESET, res);
 });
 
 /**
  * Edit profile end point
-*/
+ */
 app.get('/profile', (req, res) => {
-	getAuthCode(process.env.EDIT_PROFILE_POLICY_AUTHORITY, [], APP_STATES.EDIT_PROFILE, res);
+    getAuthCode(process.env.EDIT_PROFILE_POLICY_AUTHORITY, [], APP_STATES.EDIT_PROFILE, res);
 });
 
 /**
  * Sign out end point
-*/
-app.get('/signout', async (req, res) => {
-	logoutUri = process.env.LOGOUT_ENDPOINT;
-	req.session.destroy(() => {
-		//When session destruction succeeds, notify B2C service using the logout uri.
-		res.redirect(logoutUri);
-	});
+ */
+app.get('/signout', async(req, res) => {
+    logoutUri = process.env.LOGOUT_ENDPOINT;
+    localStorage.removeItem('idToken')
+    req.session.destroy(() => {
+        //When session destruction succeeds, notify B2C service using the logout uri.
+        res.redirect(logoutUri);
+    });
 });
 
 app.get('/redirect', (req, res) => {
 
-	//determine the reason why the request was sent by checking the state
-	if (req.query.state === APP_STATES.LOGIN) {
-		//prepare the request for authentication        
-		tokenRequest.code = req.query.code;
-		confidentialClientApplication.acquireTokenByCode(tokenRequest).then((response) => {
+    //determine the reason why the request was sent by checking the state
+    if (req.query.state === APP_STATES.LOGIN) {
+        //prepare the request for authentication        
+        tokenRequest.code = req.query.code;
+        confidentialClientApplication.acquireTokenByCode(tokenRequest).then((response) => {
 
-			req.session.sessionParams = { user: response.account, idToken: response.idToken };
-			Device.find({}).then((devices) =>
-				res.render('home', {
-					devices: multipleMongooseToObject(devices),
-					showSignInButton: false,
-					givenName: response.account.idTokenClaims.given_name,
-				}),
-			);
-			route(app);
-		}).catch((error) => {
-			console.log("\nErrorAtLogin: \n" + error);
-		});
-	} else if (req.query.state === APP_STATES.PASSWORD_RESET) {
-		//If the query string has a error param
-		if (req.query.error) {
-			//and if the error_description contains AADB2C90091 error code
-			//Means user selected the Cancel button on the password reset experience 
-			if (JSON.stringify(req.query.error_description).includes('AADB2C90091')) {
-				//Send the user home with some message
-				//But always check if your session still exists
-				Device.find({}).then((devices) =>
-					res.render('home', {
-						devices: multipleMongooseToObject(devices),
-						showSignInButton: false,
-						givenName: req.session.sessionParams.user.idTokenClaims.given_name,
-						message: 'User has cancelled the operation',
-					}),
-				);
-				route(app);
-			}
-		} else {
+            req.session.sessionParams = { user: response.account, idToken: response.idToken };
+            Device.find({}).then((devices) =>
+                res.render('home', {
+                    devices: multipleMongooseToObject(devices),
+                    showSignInButton: false,
+                    givenName: response.account.idTokenClaims.given_name,
+                }),
+            );
+            localStorage.setItem('idToken', response.idToken)
+            route(app);
+        }).catch((error) => {
+            console.log("\nErrorAtLogin: \n" + error);
+        });
+    } else if (req.query.state === APP_STATES.PASSWORD_RESET) {
+        //If the query string has a error param
+        if (req.query.error) {
+            //and if the error_description contains AADB2C90091 error code
+            //Means user selected the Cancel button on the password reset experience 
+            if (JSON.stringify(req.query.error_description).includes('AADB2C90091')) {
+                //Send the user home with some message
+                //But always check if your session still exists
+                Device.find({}).then((devices) =>
+                    res.render('home', {
+                        devices: multipleMongooseToObject(devices),
+                        showSignInButton: false,
+                        givenName: req.session.sessionParams.user.idTokenClaims.given_name,
+                        message: 'User has cancelled the operation',
+                    }),
+                );
+                route(app);
+            }
+        } else {
 
-			Device.find({}).then((devices) =>
-				res.render('home', {
-					devices: multipleMongooseToObject(devices),
-					showSignInButton: false,
-					givenName: req.session.sessionParams.user.idTokenClaims.given_name,
-				}),
-			);
-			route(app);
-		}
+            Device.find({}).then((devices) =>
+                res.render('home', {
+                    devices: multipleMongooseToObject(devices),
+                    showSignInButton: false,
+                    givenName: req.session.sessionParams.user.idTokenClaims.given_name,
+                }),
+            );
+            route(app);
+        }
 
-	} else if (req.query.state === APP_STATES.EDIT_PROFILE) {
+    } else if (req.query.state === APP_STATES.EDIT_PROFILE) {
 
-		tokenRequest.scopes = [];
-		tokenRequest.code = req.query.code;
+        tokenRequest.scopes = [];
+        tokenRequest.code = req.query.code;
 
-		//Request token with claims, including the name that was updated.
-		confidentialClientApplication.acquireTokenByCode(tokenRequest).then((response) => {
-			req.session.sessionParams = { user: response.account, idToken: response.idToken };
-			console.log("\nAuthToken: \n" + JSON.stringify(response));
-			Device.find({}).then((devices) =>
-				res.render('home', {
-					devices: multipleMongooseToObject(devices),
-					showSignInButton: false,
-					givenName: response.account.idTokenClaims.given_name,
-				}),
-			);
-			route(app);
-		}).catch((error) => {
-			//Handle error
-		});
-	} else {
-		res.status(500).send('We do not recognize this response!');
-	}
+        //Request token with claims, including the name that was updated.
+        confidentialClientApplication.acquireTokenByCode(tokenRequest).then((response) => {
+            req.session.sessionParams = { user: response.account, idToken: response.idToken };
+            console.log("\nAuthToken: \n" + JSON.stringify(response));
+            Device.find({}).then((devices) =>
+                res.render('home', {
+                    devices: multipleMongooseToObject(devices),
+                    showSignInButton: false,
+                    givenName: response.account.idTokenClaims.given_name,
+                }),
+            );
+            route(app);
+        }).catch((error) => {
+            //Handle error
+        });
+    } else {
+        res.status(500).send('We do not recognize this response!');
+    }
 
 });
 
@@ -422,5 +434,5 @@ app.get('/redirect', (req, res) => {
 route(app);
 
 app.listen(process.env.SERVER_PORT, () => {
-	console.log(`App listening on port ${process.env.SERVER_PORT}`);
+    console.log(`App listening on port ${process.env.SERVER_PORT}`);
 });

@@ -5,37 +5,37 @@
                 {{#each devices}}
                 <div class='col-sm-6 col-lg-4 mt-5' style="text-align: center;">
                     {{#compareStrings this.sensor 'BAT'}}
-                    <span class='dot'>
+                    <span class='dot bat'>
                         <h3>{{ this.value }}%</h3>
                     </span>
                     <h4 class='name mt-2'>Battery</h4>
                     {{/compareStrings }}
                     {{#compareStrings this.sensor 'PH'}}
-                    <span class='dot'>
+                    <span class='dot pH'>
                         <h3>{{ this.value }}</h3>
                     </span>
                     <h4 class='name mt-2'>pH</h4>
                     {{/compareStrings }}
                     {{#compareStrings this.sensor 'WT'}}
-                    <span class='dot'>
+                    <span class='dot wt'>
                         <h3>{{ this.value }}°C</h3>
                     </span>
                     <h4 class='name mt-2'>Temperature</h4>
                     {{/compareStrings }}
                     {{#compareStrings this.sensor 'COND'}}
-                    <span class='dot'>
+                    <span class='dot cond'>
                         <h3>{{ this.value }}µS/cm</h3>
                     </span>
                     <h4 class='name mt-2'>Conductivity</h4>
                     {{/compareStrings }}
                     {{#compareStrings this.sensor 'DO'}}
-                    <span class='dot'>
+                    <span class='dot do'>
                         <h3>{{ this.value }}%</h3>
                     </span>
                     <h4 class='name mt-2'>DO</h4>
                     {{/compareStrings }}
                     {{#compareStrings this.sensor 'ORP'}}
-                    <span class='dot'>
+                    <span class='dot orp'>
                         <h3>{{ this.value }}V</h3>
                     </span>
                     <h4 class='name mt-2'>ORP</h4>
@@ -46,16 +46,16 @@
                 <div class="status" style="text-align: center; width: 100%;">
                     <h3>Status</h3>
                     {{#isOr 'pH unsafe' 'DO unsafe'}}
-                    <h3 style="color: red;">{{devices.6.status}}</h3>
+                    <h3 style="color: #B80000;">{{devices.6.status}}</h3>
                     {{else}}
-                    <h3 style="color: green;">{{devices.6.status}}</h3>
+                    <h3 style="color: #65B741;">{{devices.6.status}}</h3>
                     {{/isOr}}
 
                     <h3>Potability</h3>
                     {{#eq devices.7.potability 'Drinkable'}}
-                    <h3 style="color: green;">Drinkable</h3>
+                    <h3 style="color: #65B741;">Drinkable</h3>
                     {{else}}
-                    <h3 style="color: red;">Undrinkable</h3>
+                    <h3 style="color: #B80000;">Undrinkable</h3>
                     {{/eq}}
 
                 </div>
@@ -63,3 +63,86 @@
         </div>
     </div>
 </div>
+
+<script>
+    //Colors
+    const red = '#B80000'
+    const orange = '#E36414'
+    const yellow = '#F4CE14'
+    const green = '#65B741'
+
+    // Elements
+    const bat = document.querySelector('.bat');
+    const pH = document.querySelector('.pH');
+    const cond = document.querySelector('.cond');
+    const orp = document.querySelector('.orp');
+    const DO = document.querySelector('.do');
+
+    // pH
+    let valuepH = parseFloat(pH.textContent)
+    if(valuepH <= 4) {
+        pH.style.color = red;
+        pH.style.borderColor = red;
+    } else if(valuepH > 4 && valuepH <= 5) {
+        pH.style.color = orange;
+        pH.style.borderColor = orange;
+    } else if(valuepH > 5 && valuepH <= 6) {
+        pH.style.color = yellow;
+        pH.style.borderColor = yellow;
+    } else if(valuepH > 6 && valuepH <= 8.5) {
+        pH.style.color = green;
+        pH.style.borderColor = green;
+    } else if(valuepH > 8.5 && valuepH <= 9) {
+        pH.style.color = yellow;
+        pH.style.borderColor = yellow;
+    } else if(valuepH > 9 && valuepH <= 10) {
+        pH.style.color = orange;
+        pH.style.borderColor = orange;
+    } else {
+        pH.style.color = red;
+        pH.style.borderColor = red;
+    }
+
+    // ORP
+    let valueORP = parseFloat(orp.textContent)
+    if(valueORP <= -0.5) {
+        orp.style.color = red;
+        orp.style.borderColor = red;
+    } else if(valueORP > -0.5 && valueORP <= 0.3) {
+        orp.style.color = green;
+        orp.style.borderColor = green;
+    } else if(valueORP > 0.3 && valueORP <= 0.4) {
+        orp.style.color = orange;
+        orp.style.borderColor = orange;
+    } else {
+        orp.style.color = yellow;
+        orp.style.borderColor = yellow;
+    }
+
+    // DO
+    let valueDO = parseFloat(DO.textContent)
+    if(valueDO <= 6) {
+        DO.style.color = orange;
+        DO.style.borderColor = orange;
+    } else if(valueDO > 6 && valueDO <= 8) {
+        DO.style.color = green;
+        DO.style.borderColor = green;
+    } else {
+        DO.style.color = orange;
+        DO.style.borderColor = orange;
+    }
+
+    // COND
+    let valueCOND = parseFloat(cond.textContent)
+    if(valueCOND <= 50) {
+        cond.style.color = orange;
+        cond.style.borderColor = orange;
+    } else if(valueCOND > 50 && valueCOND <= 800) {
+        cond.style.color = green;
+        cond.style.borderColor = green;
+    } else {
+        cond.style.color = orange;
+        cond.style.borderColor = orange;
+    }
+
+</script>

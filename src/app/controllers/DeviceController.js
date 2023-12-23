@@ -27,7 +27,7 @@ const blobServiceClient = BlobServiceClient.fromConnectionString(connectionStrin
 const containerClient = blobServiceClient.getContainerClient(containerName);
 
 // Variables of sensor devices
-let bat, pH, wt, cond, DO, orp, TDS /*Total Dissolved Solids*/;
+let bat, pH, wt, cond, DO, orp, TDS /*Total Dissolved Solids*/ ;
 
 // async function receiveMessages() {
 // 	const response = await queueClient.receiveMessages({ numberOfMessages: 1 });
@@ -60,211 +60,211 @@ let bat, pH, wt, cond, DO, orp, TDS /*Total Dissolved Solids*/;
 
 // Read data from the queue
 async function readData() {
-	// Lấy thông tin về blob
-	const blobClient = containerClient.getBlobClient('water-quality-iot-hub/00/2023/12/15/04/16.json');
+    // Lấy thông tin về blob
+    const blobClient = containerClient.getBlobClient('water-quality-iot-hub/00/2023/12/14/02/30.json');
 
-	// Tải dữ liệu từ blob
-	const downloadResponse = await blobClient.download();
-	const downloadedData = await streamToString(downloadResponse.readableStreamBody);
+    // Tải dữ liệu từ blob
+    const downloadResponse = await blobClient.download();
+    const downloadedData = await streamToString(downloadResponse.readableStreamBody);
 
-	// Print raw data
-	// console.log('Dữ liệu từ blob:', downloadedData);
+    // Print raw data
+    // console.log('Dữ liệu từ blob:', downloadedData);
 
-	const startLocation = downloadedData.length / 2;
-	const endLocation = downloadedData.length;
+    const startLocation = downloadedData.length / 2;
+    const endLocation = downloadedData.length;
 
-	var data = downloadedData.slice(startLocation, endLocation);
+    var data = downloadedData.slice(startLocation, endLocation);
 
-	// Parse chuỗi JSON thành đối tượng JavaScript
-	const jsonObject = JSON.parse(data);
+    // Parse chuỗi JSON thành đối tượng JavaScript
+    const jsonObject = JSON.parse(data);
 
-	// Get Body of data
-	const decodedData = atob(jsonObject.Body);
+    // Get Body of data
+    const decodedData = atob(jsonObject.Body);
 
-	// Parse to Json data
-	const temp = JSON.parse(decodedData);
+    // Parse to Json data
+    const temp = JSON.parse(decodedData);
 
-	const obj = { data: [] };
+    const obj = { data: [] };
 
-	for (let i = 0; i < 6; i++) {
-		obj.data[i] = temp.data[i];
-		if (obj.data[i].sensor === "WT") {
-			wt = parseFloat(obj.data[i].value);
-		} else if (obj.data[i].sensor === "DO") {
-			DO = parseFloat(obj.data[i].value);
-		} else if (obj.data[i].sensor === "COND") {
-			cond = parseFloat(obj.data[i].value);
-		} else if (obj.data[i].sensor === "ORP") {
-			orp = parseFloat(obj.data[i].value);
-		} else if (obj.data[i].sensor === "PH") {
-			pH = parseFloat(obj.data[i].value);
-		} else if (obj.data[i].sensor === "BAT") {
-			bat = parseFloat(obj.data[i].value);
-		}
-	}
+    for (let i = 0; i < 6; i++) {
+        obj.data[i] = temp.data[i];
+        if (obj.data[i].sensor === "WT") {
+            wt = parseFloat(obj.data[i].value);
+        } else if (obj.data[i].sensor === "DO") {
+            DO = parseFloat(obj.data[i].value);
+        } else if (obj.data[i].sensor === "COND") {
+            cond = parseFloat(obj.data[i].value);
+        } else if (obj.data[i].sensor === "ORP") {
+            orp = parseFloat(obj.data[i].value);
+        } else if (obj.data[i].sensor === "PH") {
+            pH = parseFloat(obj.data[i].value);
+        } else if (obj.data[i].sensor === "BAT") {
+            bat = parseFloat(obj.data[i].value);
+        }
+    }
 
-	TDS = cond * 1000 / 2;
+    TDS = cond * 1000 / 2;
 
-	const inputData = [pH, TDS, 0, 0, 0, cond, 0, 0, 0]; // Replace with your actual input data
+    const inputData = [pH, TDS, 0, 0, 0, cond, 0, 0, 0]; // Replace with your actual input data
 
-	let options = {
-		mode: 'text',
-		pythonOptions: ['-u'], // unbuffered output
-		scriptPath: 'D://Downloads//Smart-Water-Monitoring-master//src//app//pythonshell', // Replace with the actual path
-		args: inputData.map(String)
-	};
+    let options = {
+        mode: 'text',
+        pythonOptions: ['-u'], // unbuffered output
+        scriptPath: 'D://Downloads//Smart-Water-Monitoring-master//src//app//pythonshell', // Replace with the actual path
+        args: inputData.map(String)
+    };
 
-	let status = getStatus(pH, DO, TDS);
-	obj.data.push(status);
+    let status = getStatus(pH, DO, TDS);
+    obj.data.push(status);
 
-	// PythonShell.run('python_script.py', options).then(messages => {
-	// 	// results is an array consisting of messages collected during execution
-	// 	let potability = getPotability(JSON.stringify(messages));
-	// 	obj.data.push(potability);
-	// 	console.log(obj);
-	// });
+    // PythonShell.run('python_script.py', options).then(messages => {
+    // 	// results is an array consisting of messages collected during execution
+    // 	let potability = getPotability(JSON.stringify(messages));
+    // 	obj.data.push(potability);
+    // 	console.log(obj);
+    // });
 
-	//console.log(obj.data);
-	return obj.data;
+    //console.log(obj.data);
+    return obj.data;
 }
 
 // Hàm chuyển đổi readable stream thành string
 async function streamToString(readableStream) {
-	return new Promise((resolve, reject) => {
-		const chunks = [];
-		readableStream.on('data', (data) => {
-			chunks.push(data.toString());
-		});
-		readableStream.on('end', () => {
-			resolve(chunks.join(''));
-		});
-		readableStream.on('error', reject);
-	});
+    return new Promise((resolve, reject) => {
+        const chunks = [];
+        readableStream.on('data', (data) => {
+            chunks.push(data.toString());
+        });
+        readableStream.on('end', () => {
+            resolve(chunks.join(''));
+        });
+        readableStream.on('error', reject);
+    });
 }
 
 function updateData() {
-	let data = {};
-	data.battery = bat;
-	data.pH = pH;
-	data.temperature = wt;
-	data.conductivity = cond;
-	data.do = DO;
-	data.orp = orp;
-	data.TDS = TDS;
-	return data;
+    let data = {};
+    data.battery = bat;
+    data.pH = pH;
+    data.temperature = wt;
+    data.conductivity = cond;
+    data.do = DO;
+    data.orp = orp;
+    data.TDS = TDS;
+    return data;
 }
 
 // Predict quality from trained model
 function getStatus(pH, DO, TDS) {
-	if (pH < 6 || pH > 8.5 || orp >= -0.5 || DO >= 0.0004 || cond < 50 || cond > 1500) {
-		let obj = { status: 'Unsafe' };
-		return obj;
-	}
-	let obj = { status: 'Safe' };
-	return obj;
+    if (pH < 6 || pH > 8.5 || orp >= -0.5 || DO >= 0.0004 || cond < 50 || cond > 1500) {
+        let obj = { status: 'Unsafe' };
+        return obj;
+    }
+    let obj = { status: 'Safe' };
+    return obj;
 }
 
 function saveData() {
-	let data = {};
-	data.pH = pH;
-	data.temperature = wt;
-	data.conductivity = cond;
-	data.do = DO;
-	data.orp = orp;
-	data.tds = TDS;
-	return data;
+    let data = {};
+    data.pH = pH;
+    data.temperature = wt;
+    data.conductivity = cond;
+    data.do = DO;
+    data.orp = orp;
+    data.tds = TDS;
+    return data;
 }
 
 // Predict quality from trained model
 function getPotability(message) {
-	if (message === '["[1]"]') {
-		let obj = { potability: 'Drinkable' };
-		return obj;
-	}
-	let obj = { status: 'Undrinkable' };
-	return obj;
+    if (message === '["[1]"]') {
+        let obj = { potability: 'Drinkable' };
+        return obj;
+    }
+    let obj = { status: 'Undrinkable' };
+    return obj;
 }
 
 class DeviceController {
-	// [GET] /devices/:slug
-	show(req, res, next) {
-		readData().then((devices) => {
-			res.render('devices/show', { devices });
-		}).catch(next);
+    // [GET] /devices/:slug
+    show(req, res, next) {
+        readData().then((devices) => {
+            res.render('devices/show', { devices });
+        }).catch(next);
 
-		Device.updateOne({ slug: req.params.slug }, updateData(), {
-			deletedAt: req.params.deletedAt,
-		}).catch(next);
-	}
+        Device.updateOne({ slug: req.params.slug }, updateData(), {
+            deletedAt: req.params.deletedAt,
+        }).catch(next);
+    }
 
-	// [GET] /devices/create
-	create(req, res, next) {
-		res.render('devices/create');
-	}
+    // [GET] /devices/create
+    create(req, res, next) {
+        res.render('devices/create');
+    }
 
-	// [POST] /devices/store
-	store(req, res, next) {
-		const device = new Device(req.body);
-		device
-			.save()
-			.then(() => res.redirect('/me/stored/devices'))
-			.catch(next);
-	}
+    // [POST] /devices/store
+    store(req, res, next) {
+        const device = new Device(req.body);
+        device
+            .save()
+            .then(() => res.redirect('/me/stored/devices'))
+            .catch(next);
+    }
 
-	// [GET] /devices/:id/edit
-	edit(req, res, next) {
-		Device.findById(req.params.id)
-			.then((device) =>
-				res.render('devices/edit', {
-					device: mongooseToObject(device),
-				}),
-			)
-			.catch(next);
-	}
+    // [GET] /devices/:id/edit
+    edit(req, res, next) {
+        Device.findById(req.params.id)
+            .then((device) =>
+                res.render('devices/edit', {
+                    device: mongooseToObject(device),
+                }),
+            )
+            .catch(next);
+    }
 
-	// [PUT] /devices/:id
-	update(req, res, next) {
-		Device.updateOne({ _id: req.params.id }, req.body, {
-			deletedAt: req.params.deletedAt,
-		})
-			.then(() => res.redirect('/me/stored/devices'))
-			.catch(next);
-	}
+    // [PUT] /devices/:id
+    update(req, res, next) {
+        Device.updateOne({ _id: req.params.id }, req.body, {
+                deletedAt: req.params.deletedAt,
+            })
+            .then(() => res.redirect('/me/stored/devices'))
+            .catch(next);
+    }
 
-	// [DELETE] /devices/:id
-	delete(req, res, next) {
-		Device.delete({ _id: req.params.id })
-			.then(() => res.redirect('back'))
-			.catch(next);
-	}
+    // [DELETE] /devices/:id
+    delete(req, res, next) {
+        Device.delete({ _id: req.params.id })
+            .then(() => res.redirect('back'))
+            .catch(next);
+    }
 
-	// [DELETE] /devices/:id/force
-	forceDelete(req, res, next) {
-		Device.deleteOne({ _id: req.params.id })
-			.then(() => res.redirect('back'))
-			.catch(next);
-	}
+    // [DELETE] /devices/:id/force
+    forceDelete(req, res, next) {
+        Device.deleteOne({ _id: req.params.id })
+            .then(() => res.redirect('back'))
+            .catch(next);
+    }
 
-	// [PATCH] /devices/:id/restore
-	restore(req, res, next) {
-		Device.restore({ _id: req.params.id })
-			.then(() => res.redirect('back'))
-			.catch(next);
-	}
+    // [PATCH] /devices/:id/restore
+    restore(req, res, next) {
+        Device.restore({ _id: req.params.id })
+            .then(() => res.redirect('back'))
+            .catch(next);
+    }
 
-	// [POST] /devices/handle-form-actions
-	handleFormActions(req, res, next) {
-		switch (req.body.action) {
-			case 'delete':
-				Device.delete({ _id: { $in: req.body.courseIds } })
-					.then(() => res.redirect('back'))
-					.catch(next);
-				break;
+    // [POST] /devices/handle-form-actions
+    handleFormActions(req, res, next) {
+        switch (req.body.action) {
+            case 'delete':
+                Device.delete({ _id: { $in: req.body.courseIds } })
+                    .then(() => res.redirect('back'))
+                    .catch(next);
+                break;
 
-			default:
-				res.json({ message: 'Unknown action!' });
-		}
-	}
+            default:
+                res.json({ message: 'Unknown action!' });
+        }
+    }
 }
 
 module.exports = new DeviceController();

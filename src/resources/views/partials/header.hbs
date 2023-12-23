@@ -36,12 +36,10 @@
 
 <script>
 	const givenName = "{{givenName}}";
-	console.log(givenName);
 
 	if (!givenName) {
 		const givenNameID = document.querySelector("#navbarDropdown");
-		console.log(givenNameID)
-		givenNameID.innerHTML = localStorage.getItem("givenName")
+		givenNameID.innerHTML = givenName || localStorage.getItem("givenName")
 	} else {
 		localStorage.setItem("givenName", givenName);
 	}
