@@ -166,6 +166,12 @@ hbs.registerHelper("compareStrings", function (p, q, options) {
 hbs.registerHelper("isOr", function (cond1, cond2, options) {
 	return cond1 || cond2 ? options.fn(this) : options.inverse(this);
 });
+hbs.registerHelper("greaterThan", function (cond1, cond2, options) {
+	return cond1 > cond2 ? options.fn(this) : options.inverse(this);
+});
+hbs.registerHelper("lessThan", function (cond1, cond2, options) {
+	return cond1 < cond2 ? options.fn(this) : options.inverse(this);
+});
 
 /**
  * This method is used to generate an auth code request

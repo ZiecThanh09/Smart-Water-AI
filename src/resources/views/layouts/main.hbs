@@ -19,6 +19,12 @@
 
         <div>
             {{{body}}}
+            <script>
+                // Reload the page after 5000 milliseconds (5 seconds)
+                setTimeout(function () {
+                    location.reload();
+                }, 5000);
+            </script>
         </div>
 
         {{> footer}}

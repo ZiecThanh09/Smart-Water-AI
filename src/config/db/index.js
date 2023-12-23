@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 async function connect() {
 	try {
-		await mongoose.connect('mongodb://127.0.0.1:27017/smart_water_monitoring', {
+		await mongoose.connect('mongodb+srv://ziecthanh:ayern741563@smart-water.k1zqdip.mongodb.net/smart-water?retryWrites=true&w=majority', {
 			useNewUrlParser: true,
 			useUnifiedTopology: true,
 		});

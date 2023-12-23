@@ -1,4 +1,5 @@
 const Device = require('../models/Device');
+const Data = require('../models/Data');
 
 const { mongooseToObject } = require('../../util/mongoose');
 
@@ -9,7 +10,7 @@ const { BlobServiceClient } = require('@azure/storage-blob');
 const { QueueServiceClient } = require("@azure/storage-queue");
 
 // Chuỗi kết nối đến Azure Storage Account
-const connectionString = 'DefaultEndpointsProtocol=https;AccountName=qowstorage;AccountKey=WXocdFSa4e44U67pGFVgfHMsDbklqwkZyfPCFWglS90Q0M4t9F6abuJU/wN2M3pB+jqw1rcCEpiK+AStOaF/Gg==;EndpointSuffix=core.windows.net';
+const connectionString = 'DefaultEndpointsProtocol=https;AccountName=qowstorage;AccountKey=lpqA6X57NSTYa1u8Sh79E5CrJ+wP7inKo4IzEcayNqeR13M0GegJrr2wnZuLQQ/PM21bM5OtYFck+ASt2gUE3Q==;EndpointSuffix=core.windows.net';
 const queueName = 'sensordata';
 
 const queueServiceClient = QueueServiceClient.fromConnectionString(connectionString);
@@ -29,10 +30,10 @@ const containerClient = blobServiceClient.getContainerClient(containerName);
 let bat, pH, wt, cond, DO, orp, TDS /*Total Dissolved Solids*/;
 
 // async function receiveMessages() {
-// 	while (true) {
-// 		const response = await queueClient.receiveMessages({ numberOfMessages: 1 });
-// 		const messages = response.receivedMessageItems;
+// 	const response = await queueClient.receiveMessages({ numberOfMessages: 1 });
+// 	const messages = response.receivedMessageItems;
 
+// 	if (messages.length > 0) {
 // 		for (const message of messages) {
 // 			// Chuyển đổi Base64 thành Buffer
 // 			const buffer = Buffer.from(message.messageText, 'base64');
@@ -43,12 +44,10 @@ let bat, pH, wt, cond, DO, orp, TDS /*Total Dissolved Solids*/;
 // 			// Parse chuỗi JSON thành đối tượng JavaScript
 // 			// const jsonObject = JSON.parse(jsonData);
 
-// 			const startStr = jsonData.search('water-test-iot-hub');
+// 			const startStr = jsonData.search('water-quality-iot-hub');
 // 			const endStr = jsonData.search("json");
 
 // 			blobName = jsonData.slice(startStr, endStr + 4);
-
-// 			console.log(blobName);
 
 // 			// Xóa message sau khi xử lý
 // 			await queueClient.deleteMessage(message.messageId, message.popReceipt);
@@ -56,12 +55,13 @@ let bat, pH, wt, cond, DO, orp, TDS /*Total Dissolved Solids*/;
 // 			return readData();
 // 		}
 // 	}
+// 	else return readData();
 // }
 
 // Read data from the queue
 async function readData() {
 	// Lấy thông tin về blob
-	const blobClient = containerClient.getBlobClient('water-test-iot-hub/00/2023/07/04/09/55.json');
+	const blobClient = containerClient.getBlobClient('water-quality-iot-hub/00/2023/12/15/04/16.json');
 
 	// Tải dữ liệu từ blob
 	const downloadResponse = await blobClient.download();
@@ -117,12 +117,12 @@ async function readData() {
 	let status = getStatus(pH, DO, TDS);
 	obj.data.push(status);
 
-	PythonShell.run('python_script.py', options).then(messages => {
-		// results is an array consisting of messages collected during execution
-		let potability = getPotability(JSON.stringify(messages));
-		obj.data.push(potability);
-		console.log(obj);
-	});
+	// PythonShell.run('python_script.py', options).then(messages => {
+	// 	// results is an array consisting of messages collected during execution
+	// 	let potability = getPotability(JSON.stringify(messages));
+	// 	obj.data.push(potability);
+	// 	console.log(obj);
+	// });
 
 	//console.log(obj.data);
 	return obj.data;
@@ -150,6 +150,7 @@ function updateData() {
 	data.conductivity = cond;
 	data.do = DO;
 	data.orp = orp;
+	data.TDS = TDS;
 	return data;
 }
 
@@ -161,6 +162,17 @@ function getStatus(pH, DO, TDS) {
 	}
 	let obj = { status: 'Safe' };
 	return obj;
+}
+
+function saveData() {
+	let data = {};
+	data.pH = pH;
+	data.temperature = wt;
+	data.conductivity = cond;
+	data.do = DO;
+	data.orp = orp;
+	data.tds = TDS;
+	return data;
 }
 
 // Predict quality from trained model
